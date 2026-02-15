@@ -500,3 +500,6 @@ ENV/
 out/
 publish/
 dist/
+
+# Visual Studio Code settings and workspace files, since you may be using it for multiple projects
+.vscode/
