@@ -188,7 +188,50 @@ public class FileOperationService(IFileSystem? fileSystem = null)
             _fileSystem.Directory.CreateDirectory(destDir);
         }
 
-        _fileSystem.File.Copy(source, destination, overwrite);
+        // Transaction-like copy: use temporary file for safety
+        var tempFile = destination + ".tmp";
+
+        try
+        {
+            // Copy to temp location first
+            _fileSystem.File.Copy(source, tempFile, overwrite: true);
+
+            ct.ThrowIfCancellationRequested();
+
+            // Verify copy integrity (size check)
+            var sourceSize = _fileSystem.FileInfo.New(source).Length;
+            var tempSize = _fileSystem.FileInfo.New(tempFile).Length;
+
+            if (sourceSize != tempSize)
+            {
+                throw new IOException($"Copy verification failed: size mismatch for {source}");
+            }
+
+            ct.ThrowIfCancellationRequested();
+
+            // Atomic move from temp to final destination
+            if (_fileSystem.File.Exists(destination))
+            {
+                _fileSystem.File.Delete(destination);
+            }
+            _fileSystem.File.Move(tempFile, destination);
+        }
+        catch
+        {
+            // Cleanup temp file on failure
+            if (_fileSystem.File.Exists(tempFile))
+            {
+                try
+                {
+                    _fileSystem.File.Delete(tempFile);
+                }
+                catch
+                {
+                    // Ignore cleanup errors
+                }
+            }
+            throw;
+        }
     }
 
     private void CopyDirectoryRecursive(string sourceDir, string destDir, bool overwrite, IProgress<OperationProgress>? progress, ref long bytesProcessed, long totalBytes, CancellationToken ct)
@@ -313,13 +356,22 @@ public class FileOperationService(IFileSystem? fileSystem = null)
                     ct.ThrowIfCancellationRequested();
 
                     // Delete source after successful copy
-                    if (_fileSystem.File.Exists(source))
+                    // If delete fails, don't throw - the move functionally succeeded
+                    try
                     {
-                        _fileSystem.File.Delete(source);
+                        if (_fileSystem.File.Exists(source))
+                        {
+                            _fileSystem.File.Delete(source);
+                        }
+                        else if (_fileSystem.Directory.Exists(source))
+                        {
+                            _fileSystem.Directory.Delete(source, recursive: true);
+                        }
                     }
-                    else if (_fileSystem.Directory.Exists(source))
+                    catch
                     {
-                        _fileSystem.Directory.Delete(source, recursive: true);
+                        // Ignore delete errors after successful copy
+                        // The data has been moved to destination successfully
                     }
                 }
             }, ct);
@@ -343,6 +395,50 @@ public class FileOperationService(IFileSystem? fileSystem = null)
             RaiseOperationFailed("Move", source, ex);
             throw;
         }
+    }
+
+    /// <summary>
+    /// Cleans up orphaned temporary files in a directory tree.
+    /// </summary>
+    /// <param name="directory">The directory to scan for temporary files.</param>
+    /// <param name="recursive">Whether to scan subdirectories recursively.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The number of temporary files cleaned up.</returns>
+    public async Task<int> CleanupAsync(string directory, bool recursive = true, CancellationToken ct = default)
+    {
+        ValidatePath(directory, nameof(directory));
+
+        int cleanedCount = 0;
+
+        await Task.Run(() =>
+        {
+            ct.ThrowIfCancellationRequested();
+
+            if (!_fileSystem.Directory.Exists(directory))
+            {
+                return;
+            }
+
+            var searchOption = recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+            var tempFiles = _fileSystem.Directory.GetFiles(directory, "*.tmp", searchOption);
+
+            foreach (var tempFile in tempFiles)
+            {
+                ct.ThrowIfCancellationRequested();
+
+                try
+                {
+                    _fileSystem.File.Delete(tempFile);
+                    cleanedCount++;
+                }
+                catch
+                {
+                    // Ignore errors during cleanup (file may be in use)
+                }
+            }
+        }, ct);
+
+        return cleanedCount;
     }
 
     /// <summary>

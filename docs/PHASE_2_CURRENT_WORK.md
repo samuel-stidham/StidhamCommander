@@ -92,7 +92,7 @@ Phase 1 and 1.5 established the core FileOperationService with full CRUD operati
 
 ### 4a. Transaction-like Copy
 
-- [ ] **Task**: Implement safer copy pattern
+- [x] **Task**: Implement safer copy pattern
   - Copy to temporary location first (e.g., `.tmp` suffix)
   - Verify copy integrity (size, maybe checksum)
   - Atomic rename from temp to final destination
@@ -100,14 +100,14 @@ Phase 1 and 1.5 established the core FileOperationService with full CRUD operati
 
 ### 4b. Move Rollback
 
-- [ ] **Task**: Implement rollback for failed moves
+- [x] **Task**: Implement rollback for failed moves
   - If Copy+Delete fallback fails during delete, log but don't throw
   - Consider: Track partial operations for recovery
   - Add `CleanupAsync` method for orphaned temp files
 
 ### 4c. Safety Tests
 
-- [ ] **Task**: Create `FileOperationServiceSafetyTests.cs`
+- [x] **Task**: Create `FileOperationServiceSafetyTests.cs`
   - Test copy failure midway (disk full simulation)
   - Test move rollback scenarios
   - Test cleanup after failures
