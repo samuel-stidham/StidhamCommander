@@ -1,5 +1,6 @@
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;
+using Stidham.Commander.Core.Exceptions;
 using Stidham.Commander.Core.Models;
 
 namespace Stidham.Commander.Core.Services;
@@ -24,7 +25,7 @@ public class FileOperationService(IFileSystem? fileSystem = null)
     {
         try
         {
-            GuardProtectedPath(path);
+            GuardProtectedPath(path, "Delete");
             RaiseOperationStarted("Delete", path);
 
             await Task.Run(() =>
@@ -58,7 +59,7 @@ public class FileOperationService(IFileSystem? fileSystem = null)
     {
         try
         {
-            GuardProtectedPath(path);
+            GuardProtectedPath(path, "Rename");
             RaiseOperationStarted("Rename", path);
 
             await Task.Run(() =>
@@ -95,8 +96,8 @@ public class FileOperationService(IFileSystem? fileSystem = null)
     {
         try
         {
-            GuardProtectedPath(source);
-            GuardProtectedPath(destination);
+            GuardProtectedPath(source, "Copy");
+            GuardProtectedPath(destination, "Copy");
             RaiseOperationStarted("Copy", source);
 
             await Task.Run(() =>
@@ -223,8 +224,8 @@ public class FileOperationService(IFileSystem? fileSystem = null)
     {
         try
         {
-            GuardProtectedPath(source);
-            GuardProtectedPath(destination);
+            GuardProtectedPath(source, "Move");
+            GuardProtectedPath(destination, "Move");
             RaiseOperationStarted("Move", source);
 
             await Task.Run(() =>
@@ -293,13 +294,16 @@ public class FileOperationService(IFileSystem? fileSystem = null)
     /// <summary>
     /// Guards against operations on protected system paths.
     /// </summary>
-    protected void GuardProtectedPath(string path)
+    /// <param name="path">The path to validate.</param>
+    /// <param name="operationName">The name of the operation being performed (e.g., "Delete", "Copy").</param>
+    /// <exception cref="ProtectedPathException">Thrown when attempting to operate on a protected system path.</exception>
+    protected void GuardProtectedPath(string path, string operationName)
     {
         var normalizedPath = NormalizePath(path);
 
         if (_protectedPaths.Contains(normalizedPath))
         {
-            throw new UnauthorizedAccessException($"Operation not permitted on protected path: {path}");
+            throw new ProtectedPathException(path, operationName);
         }
     }
 

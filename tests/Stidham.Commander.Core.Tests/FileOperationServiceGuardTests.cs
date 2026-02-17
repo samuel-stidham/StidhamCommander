@@ -1,4 +1,5 @@
 using System.IO.Abstractions.TestingHelpers;
+using Stidham.Commander.Core.Exceptions;
 using Stidham.Commander.Core.Models;
 using Stidham.Commander.Core.Services;
 using Xunit;
@@ -27,10 +28,12 @@ public class FileOperationServiceGuardTests
         var service = new FileOperationService(mockFileSystem);
 
         // Act & Assert
-        var ex = await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+        var ex = await Assert.ThrowsAsync<ProtectedPathException>(() =>
             service.DeleteAsync(protectedPath));
 
         Assert.Contains("protected path", ex.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(protectedPath, ex.Path);
+        Assert.Equal("Delete", ex.OperationName);
     }
 
     [Theory]
@@ -44,10 +47,12 @@ public class FileOperationServiceGuardTests
         var service = new FileOperationService(mockFileSystem);
 
         // Act & Assert
-        var ex = await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+        var ex = await Assert.ThrowsAsync<ProtectedPathException>(() =>
             service.RenameAsync(protectedPath, "/newname"));
 
         Assert.Contains("protected path", ex.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(protectedPath, ex.Path);
+        Assert.Equal("Rename", ex.OperationName);
     }
 
     [Theory]
@@ -61,10 +66,12 @@ public class FileOperationServiceGuardTests
         var service = new FileOperationService(mockFileSystem);
 
         // Act & Assert
-        var ex = await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+        var ex = await Assert.ThrowsAsync<ProtectedPathException>(() =>
             service.CopyAsync(protectedPath, "/backup"));
 
         Assert.Contains("protected path", ex.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(protectedPath, ex.Path);
+        Assert.Equal("Copy", ex.OperationName);
     }
 
     [Theory]
@@ -78,10 +85,12 @@ public class FileOperationServiceGuardTests
         var service = new FileOperationService(mockFileSystem);
 
         // Act & Assert
-        var ex = await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+        var ex = await Assert.ThrowsAsync<ProtectedPathException>(() =>
             service.MoveAsync(protectedPath, "/newlocation"));
 
         Assert.Contains("protected path", ex.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(protectedPath, ex.Path);
+        Assert.Equal("Move", ex.OperationName);
     }
 
     [Fact]
@@ -93,10 +102,12 @@ public class FileOperationServiceGuardTests
         var userHome = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
         // Act & Assert - User home root should be protected
-        var ex = await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+        var ex = await Assert.ThrowsAsync<ProtectedPathException>(() =>
             service.DeleteAsync(userHome));
 
         Assert.Contains("protected path", ex.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(userHome, ex.Path);
+        Assert.Equal("Delete", ex.OperationName);
     }
 
     [Fact]
@@ -142,10 +153,12 @@ public class FileOperationServiceGuardTests
         var service = new FileOperationService(mockFileSystem);
 
         // Act & Assert - Path normalization should handle trailing slashes
-        var ex = await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+        var ex = await Assert.ThrowsAsync<ProtectedPathException>(() =>
             service.DeleteAsync("/bin/"));
 
         Assert.Contains("protected path", ex.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal("/bin/", ex.Path);
+        Assert.Equal("Delete", ex.OperationName);
     }
 
     [Fact]
@@ -162,10 +175,12 @@ public class FileOperationServiceGuardTests
         service.AddProtectedPath("/custom/important");
 
         // Act & Assert - Custom protected path should throw
-        var ex = await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+        var ex = await Assert.ThrowsAsync<ProtectedPathException>(() =>
             service.DeleteAsync("/custom/important"));
 
         Assert.Contains("protected path", ex.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal("/custom/important", ex.Path);
+        Assert.Equal("Delete", ex.OperationName);
     }
 
     [Fact]
@@ -203,13 +218,13 @@ public class FileOperationServiceGuardTests
         };
 
         // Act & Assert
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+        await Assert.ThrowsAsync<ProtectedPathException>(() =>
             service.DeleteAsync("/etc"));
 
         Assert.True(failedEventRaised);
         Assert.NotNull(failedArgs);
         Assert.Equal("Delete", failedArgs.OperationName);
-        Assert.IsType<UnauthorizedAccessException>(failedArgs.Error);
+        Assert.IsType<ProtectedPathException>(failedArgs.Error);
     }
 
     [Theory]

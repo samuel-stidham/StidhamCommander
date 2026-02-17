@@ -1,4 +1,5 @@
 using System.IO.Abstractions.TestingHelpers;
+using Stidham.Commander.Core.Exceptions;
 using Stidham.Commander.Core.Models;
 using Stidham.Commander.Core.Services;
 using Xunit;
@@ -251,8 +252,11 @@ public class FileOperationServiceCopyTests
         var service = new FileOperationService(mockFileSystem);
 
         // Act & Assert
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+        var ex = await Assert.ThrowsAsync<ProtectedPathException>(() =>
             service.CopyAsync("/etc", "/dest"));
+
+        Assert.Equal("/etc", ex.Path);
+        Assert.Equal("Copy", ex.OperationName);
     }
 
     [Fact]
@@ -264,8 +268,11 @@ public class FileOperationServiceCopyTests
         var service = new FileOperationService(mockFileSystem);
 
         // Act & Assert
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+        var ex = await Assert.ThrowsAsync<ProtectedPathException>(() =>
             service.CopyAsync("/source", "/etc"));
+
+        Assert.Equal("/etc", ex.Path);
+        Assert.Equal("Copy", ex.OperationName);
     }
 
     [Fact]

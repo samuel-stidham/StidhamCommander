@@ -20,7 +20,7 @@ Phase 1 and 1.5 established the core FileOperationService with full CRUD operati
 
 ### 1a. Create ProtectedPathException
 
-- [ ] **Task**: Create `Exceptions/ProtectedPathException.cs`
+- [x] **Task**: Create `Exceptions/ProtectedPathException.cs`
   - Custom exception class with primary constructor
   - Properties: `string Path`, `string OperationName`
   - Inherits from `UnauthorizedAccessException`
@@ -28,13 +28,13 @@ Phase 1 and 1.5 established the core FileOperationService with full CRUD operati
 
 ### 1b. Update GuardProtectedPath
 
-- [ ] **Task**: Refactor `FileOperationService.GuardProtectedPath()`
+- [x] **Task**: Refactor `FileOperationService.GuardProtectedPath()`
   - Throw `ProtectedPathException` instead of generic `UnauthorizedAccessException`
   - Include operation name in exception for better error context
 
 ### 1c. Update Tests
 
-- [ ] **Task**: Update all guard tests to expect `ProtectedPathException`
+- [x] **Task**: Update all guard tests to expect `ProtectedPathException`
   - FileOperationServiceGuardTests.cs (13 tests)
   - FileOperationServiceCopyTests.cs (2 guard tests)
   - FileOperationServiceMoveTests.cs (2 guard tests)
