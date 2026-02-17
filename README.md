@@ -99,7 +99,7 @@ When consuming `Stidham.Commander.Core`, be prepared to handle these exceptions:
 - **`FileNotFoundException`**: Source file/directory doesn't exist
 - **`IOException`**: File collision (e.g., destination already exists), or other I/O errors
 - **`OperationCanceledException`**: Operation was cancelled via `CancellationToken`
-- **`UnauthorizedAccessException`**: Insufficient permissions (non-system paths where user lacks access)
+- **`InsufficientPermissionsException`**: Insufficient permissions on non-protected paths
 
 **Example Error Handling Pattern:**
 
@@ -112,6 +112,11 @@ catch (ProtectedPathException ex)
 {
     // Show user: "Cannot copy to/from system directory"
     logger.LogWarning("Protected path access attempt: {Path}", ex.Path);
+}
+catch (InsufficientPermissionsException ex)
+{
+    // Show user: "Insufficient permissions for this path"
+    logger.LogWarning("Permission denied for path: {Path}", ex.Path);
 }
 catch (OperationCanceledException)
 {
