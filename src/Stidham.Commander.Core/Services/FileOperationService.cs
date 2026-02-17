@@ -25,6 +25,7 @@ public class FileOperationService(IFileSystem? fileSystem = null)
     {
         try
         {
+            ValidatePath(path, nameof(path));
             GuardProtectedPath(path, "Delete");
             RaiseOperationStarted("Delete", path);
 
@@ -50,7 +51,7 @@ public class FileOperationService(IFileSystem? fileSystem = null)
             RaiseOperationFailed("Delete", path, ex);
             throw;
         }
-        catch (UnauthorizedAccessException ex)
+        catch (UnauthorizedAccessException)
         {
             var wrappedException = new InsufficientPermissionsException("Delete", path);
             RaiseOperationFailed("Delete", path, wrappedException);
@@ -70,6 +71,9 @@ public class FileOperationService(IFileSystem? fileSystem = null)
     {
         try
         {
+            ValidatePath(path, nameof(path));
+            ValidatePath(newName, nameof(newName));
+            ValidateDestinationPath(path, newName);
             GuardProtectedPath(path, "Rename");
             RaiseOperationStarted("Rename", path);
 
@@ -98,7 +102,7 @@ public class FileOperationService(IFileSystem? fileSystem = null)
             RaiseOperationFailed("Rename", path, ex);
             throw;
         }
-        catch (UnauthorizedAccessException ex)
+        catch (UnauthorizedAccessException)
         {
             var wrappedException = new InsufficientPermissionsException("Rename", path);
             RaiseOperationFailed("Rename", path, wrappedException);
@@ -118,6 +122,9 @@ public class FileOperationService(IFileSystem? fileSystem = null)
     {
         try
         {
+            ValidatePath(source, nameof(source));
+            ValidatePath(destination, nameof(destination));
+            ValidateDestinationPath(source, destination);
             GuardProtectedPath(source, "Copy");
             GuardProtectedPath(destination, "Copy");
             RaiseOperationStarted("Copy", source);
@@ -152,7 +159,7 @@ public class FileOperationService(IFileSystem? fileSystem = null)
             RaiseOperationFailed("Copy", source, ex);
             throw;
         }
-        catch (UnauthorizedAccessException ex)
+        catch (UnauthorizedAccessException)
         {
             var wrappedException = new InsufficientPermissionsException("Copy", source);
             RaiseOperationFailed("Copy", source, wrappedException);
@@ -257,6 +264,9 @@ public class FileOperationService(IFileSystem? fileSystem = null)
     {
         try
         {
+            ValidatePath(source, nameof(source));
+            ValidatePath(destination, nameof(destination));
+            ValidateDestinationPath(source, destination);
             GuardProtectedPath(source, "Move");
             GuardProtectedPath(destination, "Move");
             RaiseOperationStarted("Move", source);
@@ -322,7 +332,7 @@ public class FileOperationService(IFileSystem? fileSystem = null)
             RaiseOperationFailed("Move", source, ex);
             throw;
         }
-        catch (UnauthorizedAccessException ex)
+        catch (UnauthorizedAccessException)
         {
             var wrappedException = new InsufficientPermissionsException("Move", source);
             RaiseOperationFailed("Move", source, wrappedException);
@@ -332,6 +342,50 @@ public class FileOperationService(IFileSystem? fileSystem = null)
         {
             RaiseOperationFailed("Move", source, ex);
             throw;
+        }
+    }
+
+    /// <summary>
+    /// Validates that a path is not null, empty, or contains invalid characters.
+    /// </summary>
+    /// <param name="path">The path to validate.</param>
+    /// <param name="paramName">The parameter name for error messages.</param>
+    /// <exception cref="ArgumentNullException">Thrown when path is null.</exception>
+    /// <exception cref="ArgumentException">Thrown when path is empty or contains invalid characters.</exception>
+    protected void ValidatePath(string? path, string paramName)
+    {
+        if (path is null)
+        {
+            throw new ArgumentNullException(paramName, "Path cannot be null.");
+        }
+
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            throw new ArgumentException("Path cannot be empty or whitespace.", paramName);
+        }
+
+        // Check for invalid path characters
+        var invalidChars = Path.GetInvalidPathChars();
+        if (path.Any(c => invalidChars.Contains(c)))
+        {
+            throw new ArgumentException($"Path contains invalid characters: {path}", paramName);
+        }
+    }
+
+    /// <summary>
+    /// Validates that source and destination paths are different.
+    /// </summary>
+    /// <param name="source">The source path.</param>
+    /// <param name="destination">The destination path.</param>
+    /// <exception cref="ArgumentException">Thrown when source equals destination.</exception>
+    protected void ValidateDestinationPath(string source, string destination)
+    {
+        var normalizedSource = NormalizePath(source);
+        var normalizedDestination = NormalizePath(destination);
+
+        if (normalizedSource.Equals(normalizedDestination, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new ArgumentException($"Source and destination paths cannot be the same: {source}");
         }
     }
 

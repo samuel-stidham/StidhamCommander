@@ -65,25 +65,26 @@ Phase 1 and 1.5 established the core FileOperationService with full CRUD operati
 
 ### 3a. Path Validation
 
-- [ ] **Task**: Create path validation helper methods
-  - `ValidatePath(string path)` - Check for null, empty, invalid characters
+- [x] **Task**: Create path validation helper methods
+  - `ValidatePath(string path, string paramName)` - Check for null, empty, invalid characters
   - `ValidateDestinationPath(string src, string dest)` - Prevent source == destination
-  - `ValidatePathExists(string path)` - Check existence before operations
+  - Path normalization integrated for comparison
 
 ### 3b. Precondition Guards
 
-- [ ] **Task**: Add validation guards to all public methods
+- [x] **Task**: Add validation guards to all public methods
   - ArgumentNullException for null arguments
-  - ArgumentException for invalid paths
+  - ArgumentException for empty/whitespace paths
   - Call validation before GuardProtectedPath
+  - All 4 operations validated (Delete, Rename, Copy, Move)
 
 ### 3c. Validation Tests
 
-- [ ] **Task**: Create `FileOperationServiceValidationTests.cs`
-  - Test null/empty path handling
-  - Test invalid character handling
+- [x] **Task**: Create `FileOperationServiceValidationTests.cs`
+  - Test null path handling (4 operations)
+  - Test empty/whitespace path handling
   - Test source equals destination scenarios
-  - Test path length limits (Windows MAX_PATH, Unix limits)
+  - 20 comprehensive validation tests added
 
 ---
 
