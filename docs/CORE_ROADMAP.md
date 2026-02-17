@@ -57,13 +57,13 @@ Implemented using `IFileSystem` abstractions:
 
 ### 3.2 Search Engine
 
-- [ ] **SearchService**:
+- [x] **SearchService**:
   - Globbing support (e.g., `**/*.cs`).
   - Asynchronous streaming of results using `IAsyncEnumerable<FileSystemItem>`.
 
 ### 3.3 Stress Testing (Moved from Phase 4)
 
-- [ ] **Stress Testing**: Handling deeply nested directories (10+ levels).
+- [x] **Stress Testing**: Handling deeply nested directories (10+ levels).
 
 ---
 
