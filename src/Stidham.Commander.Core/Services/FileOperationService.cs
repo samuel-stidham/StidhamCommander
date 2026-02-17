@@ -93,13 +93,127 @@ public class FileOperationService(IFileSystem? fileSystem = null)
     /// </summary>
     public async Task CopyAsync(string source, string destination, bool overwrite = false, IProgress<OperationProgress>? progress = null, CancellationToken ct = default)
     {
-        GuardProtectedPath(source);
-        GuardProtectedPath(destination);
+        try
+        {
+            GuardProtectedPath(source);
+            GuardProtectedPath(destination);
+            RaiseOperationStarted("Copy", source);
 
-        // Step 6: Full implementation
-        RaiseOperationStarted("Copy", source);
-        await Task.CompletedTask;
-        RaiseOperationCompleted("Copy", 0);
+            await Task.Run(() =>
+            {
+                ct.ThrowIfCancellationRequested();
+
+                if (_fileSystem.File.Exists(source))
+                {
+                    // Copy single file
+                    CopySingleFile(source, destination, overwrite, ct);
+                }
+                else if (_fileSystem.Directory.Exists(source))
+                {
+                    // Copy directory tree
+                    var totalBytes = CalculateTotalSize(source);
+                    long bytesProcessed = 0;
+                    CopyDirectoryRecursive(source, destination, overwrite, progress, ref bytesProcessed, totalBytes, ct);
+                }
+                else
+                {
+                    throw new FileNotFoundException($"Source path not found: {source}");
+                }
+            }, ct);
+
+            var totalSize = CalculateTotalSize(source);
+            RaiseOperationCompleted("Copy", totalSize);
+        }
+        catch (Exception ex)
+        {
+            RaiseOperationFailed("Copy", source, ex);
+            throw;
+        }
+    }
+
+    private void CopySingleFile(string source, string destination, bool overwrite, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+
+        if (!overwrite && _fileSystem.File.Exists(destination))
+        {
+            throw new IOException($"Destination file already exists: {destination}");
+        }
+
+        // Ensure destination directory exists
+        var destDir = _fileSystem.Path.GetDirectoryName(destination);
+        if (!string.IsNullOrEmpty(destDir) && !_fileSystem.Directory.Exists(destDir))
+        {
+            _fileSystem.Directory.CreateDirectory(destDir);
+        }
+
+        _fileSystem.File.Copy(source, destination, overwrite);
+    }
+
+    private void CopyDirectoryRecursive(string sourceDir, string destDir, bool overwrite, IProgress<OperationProgress>? progress, ref long bytesProcessed, long totalBytes, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+
+        // Create destination directory if it doesn't exist
+        if (!_fileSystem.Directory.Exists(destDir))
+        {
+            _fileSystem.Directory.CreateDirectory(destDir);
+        }
+
+        // Copy all files in current directory
+        foreach (var file in _fileSystem.Directory.GetFiles(sourceDir))
+        {
+            ct.ThrowIfCancellationRequested();
+
+            var fileName = _fileSystem.Path.GetFileName(file);
+            var destFile = _fileSystem.Path.Combine(destDir, fileName);
+
+            CopySingleFile(file, destFile, overwrite, ct);
+
+            var fileSize = _fileSystem.FileInfo.New(file).Length;
+            bytesProcessed += fileSize;
+
+            RaiseOperationProgress(bytesProcessed, totalBytes);
+            progress?.Report(new OperationProgress
+            {
+                OperationName = "Copy",
+                CurrentPath = file,
+                BytesProcessed = bytesProcessed,
+                TotalBytes = totalBytes
+            });
+        }
+
+        // Recursively copy subdirectories
+        foreach (var subDir in _fileSystem.Directory.GetDirectories(sourceDir))
+        {
+            ct.ThrowIfCancellationRequested();
+
+            var dirName = _fileSystem.Path.GetFileName(subDir);
+            var destSubDir = _fileSystem.Path.Combine(destDir, dirName);
+
+            CopyDirectoryRecursive(subDir, destSubDir, overwrite, progress, ref bytesProcessed, totalBytes, ct);
+        }
+    }
+
+    private long CalculateTotalSize(string path)
+    {
+        if (_fileSystem.File.Exists(path))
+        {
+            return _fileSystem.FileInfo.New(path).Length;
+        }
+        else if (_fileSystem.Directory.Exists(path))
+        {
+            long totalSize = 0;
+
+            foreach (var file in _fileSystem.Directory.GetFiles(path, "*", SearchOption.AllDirectories))
+            {
+                totalSize += _fileSystem.FileInfo.New(file).Length;
+            }
+
+            return totalSize;
+        }
+
+        return 0;
     }
 
     /// <summary>

@@ -64,8 +64,8 @@
 
 ## Step 6: Implement CopyAsync
 
-- [ ] **6a. Task**: Full recursive `CopyAsync` with progress granularity
-- [ ] **6b. Unit Tests**: `FileOperationServiceCopyTests.cs`:
+- [x] **6a. Task**: Full recursive `CopyAsync` with progress granularity
+- [x] **6b. Unit Tests**: `FileOperationServiceCopyTests.cs`:
   - Copy single file
   - Copy directory tree
   - Progress reporting (bytes/percentage)
