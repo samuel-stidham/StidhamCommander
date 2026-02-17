@@ -75,7 +75,7 @@ Implemented using `IFileSystem` abstractions:
 
 ---
 
-## Summary: Phase 1 & 1.5 Complete
+## Summary: Phase 1, 1.5, 2 Complete
 
 **Implemented:**
 

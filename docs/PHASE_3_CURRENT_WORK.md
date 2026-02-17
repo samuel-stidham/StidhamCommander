@@ -40,14 +40,14 @@ Phase 3 focuses on navigation and search intelligence in the Core library:
 
 ### 2a. Create SearchService
 
-- [ ] **Task**: Create `Services/SearchService.cs`
+- [x] **Task**: Create `Services/SearchService.cs`
   - Globbing support (e.g., `**/*.cs`)
   - Async streaming via `IAsyncEnumerable<FileSystemItem>`
   - Cancellation support via `CancellationToken`
 
 ### 2b. SearchService Tests
 
-- [ ] **Task**: Create `SearchServiceTests.cs`
+- [x] **Task**: Create `SearchServiceTests.cs`
   - Globbing match coverage
   - Async streaming behavior
   - Cancellation behavior
