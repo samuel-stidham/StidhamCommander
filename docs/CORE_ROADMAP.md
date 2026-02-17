@@ -75,9 +75,10 @@ Implemented using `IFileSystem` abstractions:
 ## Summary: Phase 1 & 1.5 Complete
 
 **Implemented:**
+
 - FileDiscoveryService for directory navigation
 - FileOperationService with DeleteAsync, RenameAsync, CopyAsync, MoveAsync
-- Full observable pattern support (events + IProgress<T>)
+- Full observable pattern support (events + `IProgress<T>`)
 - Cross-platform protected path guarding
 - Comprehensive cancellation support
 - 126 passing unit tests

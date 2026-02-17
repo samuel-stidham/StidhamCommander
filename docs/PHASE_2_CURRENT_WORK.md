@@ -10,7 +10,7 @@
 
 Phase 1 and 1.5 established the core FileOperationService with full CRUD operations, observable patterns, and cancellation support. Phase 2 focuses on:
 
-1. **Custom Exception Types** for better error handling and UX
+1. **Custom Exception Types** for better error handling (enables frontends to provide better UX)
 2. **Validation Layer** for input validation before operations
 3. **Atomic Operation Patterns** for safer file operations
 
@@ -126,9 +126,9 @@ Phase 1 and 1.5 established the core FileOperationService with full CRUD operati
 ### 5b. Usage Documentation
 
 - [ ] **Task**: Update README with exception handling guidance
-  - Common exceptions consumers should catch
-  - Error handling patterns for TUI/GUI
-  - Logging recommendations
+  - Common exceptions frontends should catch
+  - Error handling patterns for TUI/GUI consumer implementation
+  - Logging recommendations for core library consumers
 
 ---
 
@@ -139,6 +139,7 @@ Phase 1 and 1.5 established the core FileOperationService with full CRUD operati
 - **Dependencies**: None - Phase 2 work is independent
 - **Testing Strategy**: Update existing tests + add new validation/safety tests
 - **Target**: Add ~20-30 new tests for validation and safety scenarios
+- **Architectural Principle**: Core library provides NO UX - only file operation logic, exceptions, and observables that frontends (TUI/GUI) consume
 
 ---
 
