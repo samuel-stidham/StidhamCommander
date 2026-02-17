@@ -1,6 +1,6 @@
 # StidhamCommander: Core v1.0 Roadmap & Technical Specs
 
-> **Status:** Phase 2 (In Progress - Step 1 Complete)
+> **Status:** Phase 3 (In Progress)
 > **Goal:** Implement a testable, cross-platform Write Engine using .NET 10/C# 14.
 
 ---
@@ -21,7 +21,7 @@
 
 ---
 
-## Phase 2: File Operations (Write Engine) [IN PROGRESS]
+## Phase 2: File Operations (Write Engine) [COMPLETE ✅]
 
 ### 2.1 Exception & Safety Layer [COMPLETE ✅]
 
@@ -46,11 +46,11 @@ Implemented using `IFileSystem` abstractions:
 
 ---
 
-## Phase 3: Navigation & Intelligence [PENDING]
+## Phase 3: Navigation & Intelligence [IN PROGRESS]
 
 ### 3.1 Path Resolution
 
-- [ ] **PathResolver**:
+- [x] **PathResolver**:
   - Expansion of tilde (`~`) to user home.
   - Normalization of `..` and `.` for cross-platform stability.
   - Canonical path resolution to prevent symlink loops.
@@ -61,13 +61,16 @@ Implemented using `IFileSystem` abstractions:
   - Globbing support (e.g., `**/*.cs`).
   - Asynchronous streaming of results using `IAsyncEnumerable<FileSystemItem>`.
 
+### 3.3 Stress Testing (Moved from Phase 4)
+
+- [ ] **Stress Testing**: Handling deeply nested directories (10+ levels).
+
 ---
 
 ## Phase 4: Quality Assurance [ONGOING]
 
 - [x] **Coverage Requirement**: 100% of `FileOperationService` logic covered by `MockFileSystem` tests. 126 tests across 9 test files.
 - [x] **Cancellation Testing**: Comprehensive cancellation tests including immediate cancellation, mid-operation cancellation, and timeout scenarios.
-- [ ] **Stress Testing**: Handling deeply nested directories (10+ levels).
 - [x] **Concurrency**: All operations use `Task.Run()` and accept `CancellationToken` to avoid blocking.
 
 ---
@@ -83,4 +86,4 @@ Implemented using `IFileSystem` abstractions:
 - Comprehensive cancellation support
 - 126 passing unit tests
 
-**Next Phase:** Exception refinements and custom exception types (ProtectedPathException), then Phase 3 navigation intelligence.
+**Next Phase:** Phase 3 navigation intelligence (PathResolver, SearchService, stress testing).
