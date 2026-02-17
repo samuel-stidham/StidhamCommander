@@ -1,8 +1,0 @@
----
-description: Bootstraps the AI Agent context
-globs: **/*.cs, **/*.csproj, Makefile
----
-# Cursor Bootstrap
-
-Always read `.config/ai/AGENT.md` and `docs/CORE_ROADMAP.md` at the start of every chat session.
-Follow the C# 14 and .NET 10 standards defined in the Master Agent file.
