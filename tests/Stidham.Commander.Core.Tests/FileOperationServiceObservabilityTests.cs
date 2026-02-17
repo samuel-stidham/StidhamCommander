@@ -86,7 +86,11 @@ public class FileOperationServiceObservabilityTests
     public async Task RenameAsync_ShouldRaiseOperationStartedEvent()
     {
         // Arrange
-        var service = new FileOperationService();
+        var mockFileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+        {
+            { "/test/file.txt", new MockFileData("content") }
+        });
+        var service = new FileOperationService(mockFileSystem);
         var eventRaised = false;
         OperationStartedEventArgs? eventArgs = null;
 
@@ -132,28 +136,38 @@ public class FileOperationServiceObservabilityTests
     public async Task AllOperations_ShouldAcceptIProgressParameter()
     {
         // Arrange
-        var service = new FileOperationService();
+        var mockFileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+        {
+            { "/test/file.txt", new MockFileData("content") },
+            { "/src/file.txt", new MockFileData("content") }
+        });
+        var service = new FileOperationService(mockFileSystem);
         var progress = new Progress<OperationProgress>();
 
         // Act & Assert - Should not throw
         await service.DeleteAsync("/test/file.txt", progress: progress);
         await service.CopyAsync("/src/file.txt", "/dst/file.txt", progress: progress);
-        await service.RenameAsync("/test/file.txt", "/test/renamed.txt", progress: progress);
-        await service.MoveAsync("/src/file.txt", "/dst/file.txt", progress: progress);
+        await service.RenameAsync("/src/file.txt", "/src/renamed.txt", progress: progress);
+        await service.MoveAsync("/src/renamed.txt", "/dst/moved.txt", progress: progress);
     }
 
     [Fact]
     public async Task AllOperations_ShouldAcceptCancellationToken()
     {
         // Arrange
-        var service = new FileOperationService();
+        var mockFileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+        {
+            { "/test/file.txt", new MockFileData("content") },
+            { "/src/file.txt", new MockFileData("content") }
+        });
+        var service = new FileOperationService(mockFileSystem);
         var cts = new CancellationTokenSource();
 
         // Act & Assert - Should not throw with valid token
         await service.DeleteAsync("/test/file.txt", ct: cts.Token);
         await service.CopyAsync("/src/file.txt", "/dst/file.txt", ct: cts.Token);
-        await service.RenameAsync("/test/file.txt", "/test/renamed.txt", ct: cts.Token);
-        await service.MoveAsync("/src/file.txt", "/dst/file.txt", ct: cts.Token);
+        await service.RenameAsync("/src/file.txt", "/src/renamed.txt", ct: cts.Token);
+        await service.MoveAsync("/src/renamed.txt", "/dst/moved.txt", ct: cts.Token);
     }
 
     [Fact]

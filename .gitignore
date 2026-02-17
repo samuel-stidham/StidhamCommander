@@ -503,3 +503,9 @@ dist/
 
 # Visual Studio Code settings and workspace files, since you may be using it for multiple projects
 .vscode/
+
+# Hide AI files from committing
+.config/
+.github/copilot-instructions.md
+.cursor/rules.mdc
+.claudecode.md
