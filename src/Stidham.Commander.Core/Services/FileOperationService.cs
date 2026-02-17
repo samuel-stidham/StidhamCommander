@@ -221,13 +221,73 @@ public class FileOperationService(IFileSystem? fileSystem = null)
     /// </summary>
     public async Task MoveAsync(string source, string destination, IProgress<OperationProgress>? progress = null, CancellationToken ct = default)
     {
-        GuardProtectedPath(source);
-        GuardProtectedPath(destination);
+        try
+        {
+            GuardProtectedPath(source);
+            GuardProtectedPath(destination);
+            RaiseOperationStarted("Move", source);
 
-        // Step 7: Full implementation
-        RaiseOperationStarted("Move", source);
-        await Task.CompletedTask;
-        RaiseOperationCompleted("Move", 0);
+            await Task.Run(() =>
+            {
+                ct.ThrowIfCancellationRequested();
+
+                if (!_fileSystem.File.Exists(source) && !_fileSystem.Directory.Exists(source))
+                {
+                    throw new FileNotFoundException($"Source path not found: {source}");
+                }
+
+                // Try atomic move first
+                try
+                {
+                    if (_fileSystem.File.Exists(source))
+                    {
+                        _fileSystem.File.Move(source, destination);
+                    }
+                    else if (_fileSystem.Directory.Exists(source))
+                    {
+                        _fileSystem.Directory.Move(source, destination);
+                    }
+                }
+                catch (IOException)
+                {
+                    // Atomic move failed (likely cross-volume), fallback to Copy+Delete
+                    ct.ThrowIfCancellationRequested();
+
+                    // Copy first
+                    var totalBytes = CalculateTotalSize(source);
+                    long bytesProcessed = 0;
+
+                    if (_fileSystem.File.Exists(source))
+                    {
+                        CopySingleFile(source, destination, overwrite: true, ct);
+                    }
+                    else if (_fileSystem.Directory.Exists(source))
+                    {
+                        CopyDirectoryRecursive(source, destination, overwrite: true, progress, ref bytesProcessed, totalBytes, ct);
+                    }
+
+                    ct.ThrowIfCancellationRequested();
+
+                    // Delete source after successful copy
+                    if (_fileSystem.File.Exists(source))
+                    {
+                        _fileSystem.File.Delete(source);
+                    }
+                    else if (_fileSystem.Directory.Exists(source))
+                    {
+                        _fileSystem.Directory.Delete(source, recursive: true);
+                    }
+                }
+            }, ct);
+
+            var totalSize = CalculateTotalSize(destination);
+            RaiseOperationCompleted("Move", totalSize);
+        }
+        catch (Exception ex)
+        {
+            RaiseOperationFailed("Move", source, ex);
+            throw;
+        }
     }
 
     /// <summary>

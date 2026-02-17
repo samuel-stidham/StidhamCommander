@@ -117,7 +117,11 @@ public class FileOperationServiceObservabilityTests
     public async Task MoveAsync_ShouldRaiseOperationStartedEvent()
     {
         // Arrange
-        var service = new FileOperationService();
+        var mockFileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+        {
+            ["/source/file.txt"] = new MockFileData("Content")
+        });
+        var service = new FileOperationService(mockFileSystem);
         var eventRaised = false;
         OperationStartedEventArgs? eventArgs = null;
 
