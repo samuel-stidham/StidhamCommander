@@ -61,6 +61,15 @@ The project follows a decoupled **Onion Architecture** to ensure the core busine
 - No privilege elevation is ever attempted - operations fail cleanly with informative errors
 - All file operations support cancellation via `CancellationToken`
 
+## Core v1.0 Status
+
+- **Status:** Complete
+- **File Operations:** Delete, Rename, Copy, Move with progress events and cancellation
+- **Safety:** Protected path enforcement, validation, and atomic copy safety with temp files
+- **Navigation Intelligence:** PathResolver (tilde expansion, normalization, symlink loop detection)
+- **Search:** Async globbing with `IAsyncEnumerable<FileSystemItem>`
+- **Quality:** Deep directory stress testing and 177 passing unit tests
+
 ## Technical Stack
 
 - **Language:** C# 14 (utilizing `field` keywords, extension members, and `Span<T>`)

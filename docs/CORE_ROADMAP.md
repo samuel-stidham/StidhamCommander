@@ -1,6 +1,6 @@
 # StidhamCommander: Core v1.0 Roadmap & Technical Specs
 
-> **Status:** Phase 3 (In Progress)
+> **Status:** Phase 4 (Complete)
 > **Goal:** Implement a testable, cross-platform Write Engine using .NET 10/C# 14.
 
 ---
@@ -46,7 +46,7 @@ Implemented using `IFileSystem` abstractions:
 
 ---
 
-## Phase 3: Navigation & Intelligence [IN PROGRESS]
+## Phase 3: Navigation & Intelligence [COMPLETE ✅]
 
 ### 3.1 Path Resolution
 
@@ -67,7 +67,7 @@ Implemented using `IFileSystem` abstractions:
 
 ---
 
-## Phase 4: Quality Assurance [ONGOING]
+## Phase 4: Quality Assurance [COMPLETE ✅]
 
 - [x] **Coverage Requirement**: 100% of `FileOperationService` logic covered by `MockFileSystem` tests. 126 tests across 9 test files.
 - [x] **Cancellation Testing**: Comprehensive cancellation tests including immediate cancellation, mid-operation cancellation, and timeout scenarios.
@@ -75,7 +75,7 @@ Implemented using `IFileSystem` abstractions:
 
 ---
 
-## Summary: Phase 1, 1.5, 2 Complete
+## Summary: Phase 1, 1.5, 2, 3, 4 Complete
 
 **Implemented:**
 
@@ -84,6 +84,9 @@ Implemented using `IFileSystem` abstractions:
 - Full observable pattern support (events + `IProgress<T>`)
 - Cross-platform protected path guarding
 - Comprehensive cancellation support
-- 126 passing unit tests
+- PathResolver with tilde expansion and symlink loop detection
+- SearchService with globbing and async streaming
+- Deep directory stress testing coverage
+- 177 passing unit tests
 
-**Next Phase:** Phase 3 navigation intelligence (PathResolver, SearchService, stress testing).
+**Next Phase:** Core v1.0 complete.
