@@ -1,9 +1,9 @@
 # StidhamCommander
 
-![License: MIT License](https://img.shields.io/badge/License-mit-blue.svg)
-![Build and Test](https://github.com/samuel-stidham/StidhamCommander/actions/workflows/ci.yml/badge.svg)
 ![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4)
 ![C# 14](https://img.shields.io/badge/C%23-14-239120)
+![Build and Test](https://github.com/samuel-stidham/StidhamCommander/actions/workflows/ci.yml/badge.svg?branch=main)
+![License: MIT License](https://img.shields.io/badge/License-mit-blue.svg)
 
 A high-performance, cross-platform "Orthodox File Manager" (OFM) built with **.NET 10 (LTS)** and **C# 14**.
 
