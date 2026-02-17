@@ -45,19 +45,19 @@ Phase 1 and 1.5 established the core FileOperationService with full CRUD operati
 
 ### 2a. Create FileOperationException Base Class
 
-- [ ] **Task**: Create `Exceptions/FileOperationException.cs`
+- [x] **Task**: Create `Exceptions/FileOperationException.cs`
   - Base exception for all file operation errors
   - Properties: `string OperationName`, `string Path`, `Exception? InnerException`
-  - Abstract or base class with common functionality
+  - Base class with two constructors (with/without inner exception)
 
 ### 2b. Specialized Exceptions
 
-- [ ] **Task**: Create specific exception types:
+- [x] **Task**: Create specific exception types:
   - `FileNotFoundException` - Already exists in BCL, use as-is
   - `DirectoryNotFoundException` - Already exists in BCL, use as-is
   - `IOException` - Already exists in BCL for collisions
-  - Consider: `CircularSymlinkException` for future path resolution
-  - Consider: `InsufficientPermissionsException` for permission errors
+  - `CircularSymlinkException` - Created for symlink loop detection (Phase 3)
+  - `InsufficientPermissionsException` - Created for non-protected path permission errors
 
 ---
 

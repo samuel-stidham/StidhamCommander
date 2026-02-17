@@ -1,4 +1,5 @@
 using System.IO.Abstractions.TestingHelpers;
+using Stidham.Commander.Core.Exceptions;
 using Stidham.Commander.Core.Models;
 using Stidham.Commander.Core.Services;
 using Xunit;
@@ -196,10 +197,12 @@ public class FileOperationServiceDeleteTests
         service.OperationFailed += (sender, args) => failedEventRaised = true;
 
         // Act & Assert
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+        var ex = await Assert.ThrowsAsync<InsufficientPermissionsException>(() =>
             service.DeleteAsync("/readonly/file.txt"));
 
         Assert.True(failedEventRaised);
+        Assert.Equal("Delete", ex.OperationName);
+        Assert.Equal("/readonly/file.txt", ex.Path);
     }
 
     [Fact]

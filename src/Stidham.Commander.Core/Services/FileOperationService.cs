@@ -45,6 +45,17 @@ public class FileOperationService(IFileSystem? fileSystem = null)
 
             RaiseOperationCompleted("Delete", 0);
         }
+        catch (ProtectedPathException ex)
+        {
+            RaiseOperationFailed("Delete", path, ex);
+            throw;
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            var wrappedException = new InsufficientPermissionsException("Delete", path);
+            RaiseOperationFailed("Delete", path, wrappedException);
+            throw wrappedException;
+        }
         catch (Exception ex)
         {
             RaiseOperationFailed("Delete", path, ex);
@@ -81,6 +92,17 @@ public class FileOperationService(IFileSystem? fileSystem = null)
             }, ct);
 
             RaiseOperationCompleted("Rename", 0);
+        }
+        catch (ProtectedPathException ex)
+        {
+            RaiseOperationFailed("Rename", path, ex);
+            throw;
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            var wrappedException = new InsufficientPermissionsException("Rename", path);
+            RaiseOperationFailed("Rename", path, wrappedException);
+            throw wrappedException;
         }
         catch (Exception ex)
         {
@@ -124,6 +146,17 @@ public class FileOperationService(IFileSystem? fileSystem = null)
 
             var totalSize = CalculateTotalSize(source);
             RaiseOperationCompleted("Copy", totalSize);
+        }
+        catch (ProtectedPathException ex)
+        {
+            RaiseOperationFailed("Copy", source, ex);
+            throw;
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            var wrappedException = new InsufficientPermissionsException("Copy", source);
+            RaiseOperationFailed("Copy", source, wrappedException);
+            throw wrappedException;
         }
         catch (Exception ex)
         {
@@ -283,6 +316,17 @@ public class FileOperationService(IFileSystem? fileSystem = null)
 
             var totalSize = CalculateTotalSize(destination);
             RaiseOperationCompleted("Move", totalSize);
+        }
+        catch (ProtectedPathException ex)
+        {
+            RaiseOperationFailed("Move", source, ex);
+            throw;
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            var wrappedException = new InsufficientPermissionsException("Move", source);
+            RaiseOperationFailed("Move", source, wrappedException);
+            throw wrappedException;
         }
         catch (Exception ex)
         {
