@@ -2,6 +2,9 @@ using Stidham.Commander.Core.Extensions;
 
 namespace Stidham.Commander.Core.Models;
 
+/// <summary>
+/// Represents a file system item (file or directory) with metadata.
+/// </summary>
 public record FileSystemItem
 {
     public required string Name { get; init; }

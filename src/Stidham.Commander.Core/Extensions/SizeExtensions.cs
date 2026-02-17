@@ -1,8 +1,10 @@
 namespace Stidham.Commander.Core.Extensions;
 
-// C# 14 Extension Member syntax
 public static class SizeExtensions
 {
+    /// <summary>
+    /// Converts a byte count to a human-readable size string (B, KB, MB, GB, TB).
+    /// </summary>
     extension (long bytes)
     {
         public string ToHumanReadable()
