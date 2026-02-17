@@ -10,7 +10,7 @@ StidhamCommander is a dual-pane file management system designed for power users 
 
 - **Dual-Pane Interface:** Efficient file operations inspired by Total Commander and Midnight Commander.
 - **Cross-Platform:** Developed on **Ubuntu Cinnamon 24.04 LTS**. Fully compatible with Windows and macOS.
-- **Hybrid UI:** Features both a **Terminal.Gui** TUI and an **Avalonia UI** desktop frontend.
+- **Hybrid UI:** Will Feature both a **Terminal.Gui** TUI and an **Avalonia UI** desktop frontend.
 - **Native AOT Ready:** Optimized for Ahead-of-Time compilation for near-instant startup.
 
 ## Safety & Security
